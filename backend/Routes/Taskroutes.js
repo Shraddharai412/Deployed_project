@@ -5,14 +5,20 @@ const Task = require('../Model/Tasks');
 
 // Add new task
 router.post('/', async (req, res) => {
-    try {
-        const newTask = new Task({ title: req.body.title });
-        await newTask.save();
-        res.status(201).json({ message: 'Task added successfully', task: newTask });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Failed to add task' });
+  try {
+    console.log("Incoming POST /api/tasks with body:", req.body); 
+
+    if (!req.body.title || !req.body.title.trim()) {
+      return res.status(400).json({ error: "Title is required" });
     }
+
+    const newTask = new Task({ title: req.body.title });
+    await newTask.save();
+    res.status(201).json({ message: 'Task added successfully', task: newTask });
+  } catch (err) {
+    console.error("Error in POST /api/tasks:", err);
+    res.status(500).json({ error: 'Failed to add task' });
+  }
 });
 
 // Get all tasks

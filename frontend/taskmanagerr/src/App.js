@@ -17,19 +17,18 @@ function App() {
     }
   };
 
- const handleAddTask = async () => {
-  try {
-    console.log("Sending to:", `${API}/api/tasks`, "with title:", title);
-    const response = await axios.post(`${API}/api/tasks`, { title });
-    console.log("Task added:", response.data);
-    setTitle("");
-    fetchTasks();
-  } catch (err) {
-    console.error("Error adding task:", err.response?.data || err.message);
-    alert("Failed to add task");
-  }
-};
+  const handleAddTask = async () => {
+    try {
+   
+await axios.post(`${API}/api/tasks`, { title });
 
+      setTitle("");
+      fetchTasks();
+    } catch (err) {
+      console.error("Error adding task:", err.response?.data || err.message);
+      alert("Failed to add task");
+    }
+  };
 
   const handleDeleteTask = async (id) => {
     try {
@@ -44,29 +43,37 @@ function App() {
     fetchTasks();
   }, []);
 
- return (
-  <div className="container">
-    <h1>Task Management App</h1>
-    <div className="input-group">
-      <input
-        type="text"
-        className="form-control"
-        placeholder="Enter task title"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-      />
-      <button onClick={handleAddTask}>Add Task</button>
+  return (
+    <div style={{ padding: "20px" }}>
+      <h1>Task Management App</h1>
+      <div className="input-group mb-3">
+        <input
+          type="text"
+          className="form-control"
+          placeholder="Enter task title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+        <button onClick={handleAddTask}>Add Task</button>
+      </div>
+      <ul>
+        {tasks.map((task) => (
+          <li
+            key={task._id}
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "10px",
+            }}
+          >
+            {task.title}
+            <button onClick={() => handleDeleteTask(task._id)}>Delete</button>
+          </li>
+        ))}
+      </ul>
     </div>
-    <ul>
-      {tasks.map((task) => (
-        <li key={task._id}>
-          {task.title}
-          <button onClick={() => handleDeleteTask(task._id)}>Delete</button>
-        </li>
-      ))}
-    </ul>
-  </div>
-);
+  );
 }
 
 export default App;
