@@ -1,4 +1,3 @@
-// App.js
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
@@ -19,9 +18,8 @@ function App() {
 
   const handleAddTask = async () => {
     try {
-   
-await axios.post(`${API}/api/tasks`, { title });
-
+      if (!title.trim()) return alert("Title cannot be empty");
+      await axios.post(`${API}/api/tasks`, { title });
       setTitle("");
       fetchTasks();
     } catch (err) {
@@ -44,31 +42,23 @@ await axios.post(`${API}/api/tasks`, { title });
   }, []);
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Task Management App</h1>
-      <div className="input-group mb-3">
+    <div style={{ padding: 20, maxWidth: 600, margin: "auto" }}>
+      <h2>Task Manager</h2>
+      <div style={{ display: "flex", gap: 10 }}>
         <input
           type="text"
-          className="form-control"
-          placeholder="Enter task title"
+          placeholder="Enter task"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+          style={{ flex: 1, padding: 10, borderRadius: 5, border: "1px solid #ccc" }}
         />
-        <button onClick={handleAddTask}>Add Task</button>
+        <button onClick={handleAddTask} style={{ padding: 10 }}>Add</button>
       </div>
-      <ul>
+      <ul style={{ listStyle: "none", padding: 0, marginTop: 20 }}>
         {tasks.map((task) => (
-          <li
-            key={task._id}
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: "10px",
-            }}
-          >
-            {task.title}
-            <button onClick={() => handleDeleteTask(task._id)}>Delete</button>
+          <li key={task._id} style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
+            <span>{task.title}</span>
+            <button onClick={() => handleDeleteTask(task._id)} style={{ backgroundColor: "red", color: "white", border: "none", padding: "5px 10px", borderRadius: 5 }}>Delete</button>
           </li>
         ))}
       </ul>

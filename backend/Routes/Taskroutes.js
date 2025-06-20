@@ -1,24 +1,21 @@
-// Routes/Taskroutes.js
 const express = require('express');
 const router = express.Router();
 const Task = require('../Model/Tasks');
 
 // Add new task
 router.post('/', async (req, res) => {
-  try {
-    console.log("Incoming POST /api/tasks with body:", req.body); 
-
-    if (!req.body.title || !req.body.title.trim()) {
-      return res.status(400).json({ error: "Title is required" });
+    try {
+        console.log("Incoming POST with body:", req.body);
+        if (!req.body.title || !req.body.title.trim()) {
+            return res.status(400).json({ error: "Title is required" });
+        }
+        const newTask = new Task({ title: req.body.title });
+        await newTask.save();
+        res.status(201).json({ message: 'Task added successfully', task: newTask });
+    } catch (err) {
+        console.error("Error in POST /api/tasks:", err);
+        res.status(500).json({ error: 'Failed to add task' });
     }
-
-    const newTask = new Task({ title: req.body.title });
-    await newTask.save();
-    res.status(201).json({ message: 'Task added successfully', task: newTask });
-  } catch (err) {
-    console.error("Error in POST /api/tasks:", err);
-    res.status(500).json({ error: 'Failed to add task' });
-  }
 });
 
 // Get all tasks
@@ -37,9 +34,7 @@ router.delete('/:id', async (req, res) => {
     const { id } = req.params;
     try {
         const task = await Task.findByIdAndDelete(id);
-        if (!task) {
-            return res.status(404).json({ error: 'Task not found' });
-        }
+        if (!task) return res.status(404).json({ error: 'Task not found' });
         res.status(200).json({ message: 'Task deleted successfully' });
     } catch (err) {
         console.error(err);
@@ -53,9 +48,7 @@ router.put('/updatetask/:id', async (req, res) => {
     const { title } = req.body;
     try {
         const task = await Task.findByIdAndUpdate(id, { title }, { new: true });
-        if (!task) {
-            return res.status(404).json({ error: 'Task not found' });
-        }
+        if (!task) return res.status(404).json({ error: 'Task not found' });
         res.status(200).json({ task });
     } catch (err) {
         console.error(err);
