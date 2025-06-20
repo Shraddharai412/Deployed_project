@@ -56,7 +56,7 @@ function App() {
   const styles = {
     page: {
       minHeight: "100vh",
-      background: "linear-gradient(to right, #6a11cb, #2575fc)",
+      background: "linear-gradient(to right, rgb(34, 41, 143) 10%, rgb(75, 17, 99) 100%)",
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
@@ -68,17 +68,24 @@ function App() {
       padding: 30,
       width: "100%",
       maxWidth: 600,
-      boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+      boxShadow: "0 4px 20px rgba(0,0,0,0.2)",
     },
     heading: {
       textAlign: "center",
-      color: "#333",
-      marginBottom: 20,
+      color: " rgba(230, 15, 137, 0.94)",
+      marginBottom: 30,
+      fontSize: "24px",
+    },
+    formBox: {
+      border: "1px solid #ddd",
+      borderRadius: 8,
+      padding: 20,
+      marginBottom: 30,
+      backgroundColor: "#f9f9f9",
     },
     inputGroup: {
       display: "flex",
       gap: 10,
-      marginBottom: 20,
     },
     input: {
       flex: 1,
@@ -95,6 +102,10 @@ function App() {
       cursor: "pointer",
       backgroundColor: "#007bff",
       color: "white",
+      transition: "background 0.3s",
+    },
+    buttonHover: {
+      backgroundColor: "#0056b3",
     },
     list: {
       listStyle: "none",
@@ -132,18 +143,22 @@ function App() {
     <div style={styles.page}>
       <div style={styles.container}>
         <h2 style={styles.heading}>Task Manager</h2>
-        <div style={styles.inputGroup}>
-          <input
-            type="text"
-            placeholder="Enter task"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            style={styles.input}
-          />
-          <button onClick={handleAddOrUpdateTask} style={styles.button}>
-            {editId ? "Update" : "Add"}
-          </button>
+
+        <div style={styles.formBox}>
+          <div style={styles.inputGroup}>
+            <input
+              type="text"
+              placeholder="Enter task"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              style={styles.input}
+            />
+            <button onClick={handleAddOrUpdateTask} style={styles.button}>
+              {editId ? "Update" : "Add"}
+            </button>
+          </div>
         </div>
+
         <ul style={styles.list}>
           {tasks.map((task) => (
             <li key={task._id} style={styles.listItem}>
