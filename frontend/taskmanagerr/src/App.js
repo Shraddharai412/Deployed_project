@@ -17,16 +17,19 @@ function App() {
     }
   };
 
-  const handleAddTask = async () => {
-    try {
-      await axios.post(`${API}/api/tasks`, { title });
-      setTitle("");
-      fetchTasks();
-    } catch (err) {
-      console.error("Error adding task:", err.response?.data || err.message);
-      alert("Failed to add task");
-    }
-  };
+ const handleAddTask = async () => {
+  try {
+    console.log("Sending to:", `${API}/api/tasks`, "with title:", title);
+    const response = await axios.post(`${API}/api/tasks`, { title });
+    console.log("Task added:", response.data);
+    setTitle("");
+    fetchTasks();
+  } catch (err) {
+    console.error("Error adding task:", err.response?.data || err.message);
+    alert("Failed to add task");
+  }
+};
+
 
   const handleDeleteTask = async (id) => {
     try {
