@@ -4,10 +4,8 @@ import axios from "axios";
 const API = process.env.REACT_APP_API;
 
 function App() {
-  const [formData, setFormData] = useState({ title: "" });
+  const [title, setTitle] = useState("");
   const [tasks, setTasks] = useState([]);
-  const [errors, setErrors] = useState({});
-  const [editIndex, setEditIndex] = useState(null);
 
   const fetchTasks = async () => {
     try {
@@ -18,47 +16,20 @@ function App() {
     }
   };
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    setErrors({});
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (formData.title.trim() === "") {
-      setErrors({ title: "Task title is required" });
-      return;
-    }
-
+  const handleAddTask = async () => {
     try {
-      if (editIndex === null) {
-        await axios.post(`${API}/api/tasks`, { title: formData.title });
-      } else {
-        const taskId = tasks[editIndex]._id;
-        await axios.put(`${API}/api/tasks/updatetask/${taskId}`, {
-          title: formData.title,
-        });
-      }
-
-      setFormData({ title: "" });
-      setEditIndex(null);
+      await axios.post(`${API}/api/tasks`, { title });
+      setTitle("");
       fetchTasks();
     } catch (err) {
-      console.error("Error submitting task:", err);
+      console.error("Error adding task:", err.response?.data || err.message);
+      alert("Failed to add task");
     }
   };
 
-  const handleEdit = (index) => {
-    setFormData({ title: tasks[index].title });
-    setEditIndex(index);
-    setErrors({});
-  };
-
-  const handleDelete = async (index) => {
+  const handleDeleteTask = async (id) => {
     try {
-      const taskId = tasks[index]._id;
-      await axios.delete(`${API}/api/tasks/${taskId}`);
+      await axios.delete(`${API}/api/tasks/${id}`);
       fetchTasks();
     } catch (err) {
       console.error("Error deleting task:", err);
@@ -69,6 +40,7 @@ function App() {
     fetchTasks();
   }, []);
 
+  // ✅ Styles object
   const styles = {
     page: {
       minHeight: "100vh",
@@ -91,31 +63,21 @@ function App() {
       color: "#333",
       marginBottom: "30px",
     },
-    formGroup: {
-      marginBottom: "20px",
+    inputGroup: {
       display: "flex",
-      flexDirection: "column",
-    },
-    label: {
-      marginBottom: "8px",
-      fontWeight: "bold",
-      color: "#333",
+      gap: "10px",
+      marginBottom: "20px",
     },
     input: {
+      flex: 1,
       padding: "10px 12px",
       fontSize: "16px",
       border: "2px solid #ddd",
       borderRadius: "8px",
       outline: "none",
     },
-    error: {
-      color: "#dc3545",
-      fontSize: "14px",
-      marginTop: "5px",
-    },
     button: {
-      marginTop: "10px",
-      backgroundColor: "purple",
+      backgroundColor: "#f6a000",
       color: "white",
       border: "none",
       padding: "10px 18px",
@@ -126,9 +88,8 @@ function App() {
     taskList: {
       listStyle: "none",
       padding: 0,
-      marginTop: "20px",
     },
-    listItem: {
+    taskItem: {
       backgroundColor: "#fef5e7",
       padding: "12px 16px",
       borderRadius: "10px",
@@ -138,75 +99,46 @@ function App() {
       alignItems: "center",
       boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
     },
-    buttonGroup: {
-      display: "flex",
-      gap: "10px",
-    },
-    emptyMessage: {
-      textAlign: "center",
-      fontStyle: "italic",
-      color: "#555",
-      marginTop: "20px",
+    deleteButton: {
+      backgroundColor: "#ff4d4f",
+      padding: "6px 12px",
+      borderRadius: "6px",
+      fontSize: "14px",
+      border: "none",
+      color: "white",
+      cursor: "pointer",
     },
   };
 
   return (
     <div style={styles.page}>
       <div style={styles.container}>
-        <h2 style={styles.heading}>Todo List Manager</h2>
-
-        <form onSubmit={handleSubmit}>
-          <div style={styles.formGroup}>
-            <label htmlFor="title" style={styles.label}>
-              Task
-            </label>
-            <input
-              type="text"
-              id="title"
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              style={styles.input}
-            />
-            {errors.title && <p style={styles.error}>{errors.title}</p>}
-          </div>
-
-          <button
-            type="submit"
-            style={{
-              ...styles.button,
-              backgroundColor: editIndex === null ? "purple" : "#6f42c1",
-            }}
-          >
-            {editIndex === null ? "Add Task" : "Update Task"}
+        <h1 style={styles.heading}>Task Management App</h1>
+        <div style={styles.inputGroup}>
+          <input
+            type="text"
+            placeholder="Enter task title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            style={styles.input}
+          />
+          <button onClick={handleAddTask} style={styles.button}>
+            Add Task
           </button>
-        </form>
-
-        {tasks.length === 0 ? (
-          <p style={styles.emptyMessage}>No tasks added yet</p>
-        ) : (
-          <ul style={styles.taskList}>
-            {tasks.map((task, index) => (
-              <li key={index} style={styles.listItem}>
-                <span>{task.title}</span>
-                <div style={styles.buttonGroup}>
-                  <button
-                    onClick={() => handleEdit(index)}
-                    style={{ ...styles.button, backgroundColor: "green" }}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(index)}
-                    style={{ ...styles.button, backgroundColor: "#dc3545" }}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
+        </div>
+        <ul style={styles.taskList}>
+          {tasks.map((task) => (
+            <li key={task._id} style={styles.taskItem}>
+              {task.title}
+              <button
+                onClick={() => handleDeleteTask(task._id)}
+                style={styles.deleteButton}
+              >
+                Delete
+              </button>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );
