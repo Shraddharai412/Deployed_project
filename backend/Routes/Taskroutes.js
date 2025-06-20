@@ -3,18 +3,18 @@ const router = express.Router();
 const Task = require('../Model/Tasks');
 
 router.post('/', async (req, res) => {
-  console.log("➡️ POST /api/tasks, body:", req.body);
+  console.log("POST /api/tasks, body:", req.body);
   if (!req.body.title || !req.body.title.trim()) {
-    console.log("❗ Bad Request: Missing title");
+    console.log(" Bad Request: Missing title");
     return res.status(400).json({ error: "Title is required" });
   }
   try {
     const newTask = new Task({ title: req.body.title });
     await newTask.save();
-    console.log("✅ Saved task:", newTask);
+    console.log(" Saved task:", newTask);
     res.status(201).json({ task: newTask });
   } catch (err) {
-    console.error("❌ DB save error:", err);
+    console.error(" DB save error:", err);
     res.status(500).json({ error: "Failed to add task" });
   }
 });
@@ -23,10 +23,10 @@ router.get('/', async (req, res) => {
   console.log("➡️ GET /api/tasks");
   try {
     const tasks = await Task.find();
-    console.log("✅ Returning tasks:", tasks);
+    console.log(" Returning tasks:", tasks);
     res.status(200).json({ tasks });
   } catch (err) {
-    console.error("❌ DB fetch error:", err);
+    console.error("DB fetch error:", err);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
