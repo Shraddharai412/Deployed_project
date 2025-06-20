@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-const API = process.env.REACT_APP_API;
+const API = process.env.REACT_APP_API || "http://localhost:5000";
 
 function App() {
   const [title, setTitle] = useState("");
   const [tasks, setTasks] = useState([]);
+  const [editId, setEditId] = useState(null);
 
   const fetchTasks = async () => {
     try {
@@ -16,14 +17,22 @@ function App() {
     }
   };
 
-  const handleAddTask = async () => {
+  const handleAddOrUpdateTask = async () => {
+    if (!title.trim()) return alert("Please enter a task");
+
     try {
-      await axios.post(`${API}/api/tasks`, { title });
+      if (editId) {
+        // update
+        await axios.put(`${API}/api/tasks/updatetask/${editId}`, { title });
+        setEditId(null);
+      } else {
+        // add new
+        await axios.post(`${API}/api/tasks`, { title });
+      }
       setTitle("");
       fetchTasks();
     } catch (err) {
-      console.error("Error adding task:", err.response?.data || err.message);
-      alert("Failed to add task");
+      console.error("Error saving task:", err.response?.data || err.message);
     }
   };
 
@@ -36,11 +45,15 @@ function App() {
     }
   };
 
+  const handleEditTask = (task) => {
+    setTitle(task.title);
+    setEditId(task._id);
+  };
+
   useEffect(() => {
     fetchTasks();
   }, []);
 
-  // ✅ Styles object
   const styles = {
     page: {
       minHeight: "100vh",
@@ -77,7 +90,7 @@ function App() {
       outline: "none",
     },
     button: {
-      backgroundColor: "#f6a000",
+      backgroundColor: editId ? "#6f42c1" : "#f6a000",
       color: "white",
       border: "none",
       padding: "10px 18px",
@@ -99,14 +112,18 @@ function App() {
       alignItems: "center",
       boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
     },
-    deleteButton: {
-      backgroundColor: "#ff4d4f",
+    buttonGroup: {
+      display: "flex",
+      gap: "10px",
+    },
+    smallButton: {
       padding: "6px 12px",
       borderRadius: "6px",
       fontSize: "14px",
       border: "none",
       color: "white",
       cursor: "pointer",
+      fontWeight: "bold",
     },
   };
 
@@ -122,20 +139,29 @@ function App() {
             onChange={(e) => setTitle(e.target.value)}
             style={styles.input}
           />
-          <button onClick={handleAddTask} style={styles.button}>
-            Add Task
+          <button onClick={handleAddOrUpdateTask} style={styles.button}>
+            {editId ? "Update Task" : "Add Task"}
           </button>
         </div>
+
         <ul style={styles.taskList}>
           {tasks.map((task) => (
             <li key={task._id} style={styles.taskItem}>
               {task.title}
-              <button
-                onClick={() => handleDeleteTask(task._id)}
-                style={styles.deleteButton}
-              >
-                Delete
-              </button>
+              <div style={styles.buttonGroup}>
+                <button
+                  onClick={() => handleEditTask(task)}
+                  style={{ ...styles.smallButton, backgroundColor: "green" }}
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDeleteTask(task._id)}
+                  style={{ ...styles.smallButton, backgroundColor: "#dc3545" }}
+                >
+                  Delete
+                </button>
+              </div>
             </li>
           ))}
         </ul>
