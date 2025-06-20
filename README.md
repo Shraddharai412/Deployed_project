@@ -4,7 +4,7 @@ A full-stack **Task Management App** built with the **MERN stack** that allows u
 
 ## 🚀 Live Demo
 
-🌐 [Try the App](https://taskmanager-frontend.vercel.app)
+🌐 [Try the App](https://deployed-project-sand.vercel.app/)
 
 ---
 
