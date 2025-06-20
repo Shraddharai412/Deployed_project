@@ -6,7 +6,7 @@ const API = process.env.REACT_APP_API;
 function App() {
   const [title, setTitle] = useState("");
   const [tasks, setTasks] = useState([]);
-  const [editId, setEditId] = useState(null); // track task being edited
+  const [editId, setEditId] = useState(null);
 
   const fetchTasks = async () => {
     try {
@@ -22,14 +22,11 @@ function App() {
 
     try {
       if (editId) {
-        // Update existing task
         await axios.put(`${API}/api/tasks/updatetask/${editId}`, { title });
-        setEditId(null); // reset after update
+        setEditId(null);
       } else {
-        // Add new task
         await axios.post(`${API}/api/tasks`, { title });
       }
-
       setTitle("");
       fetchTasks();
     } catch (err) {
@@ -56,44 +53,113 @@ function App() {
     fetchTasks();
   }, []);
 
+  const styles = {
+    page: {
+      minHeight: "100vh",
+      background: "linear-gradient(to right, #6a11cb, #2575fc)",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      padding: 20,
+    },
+    container: {
+      backgroundColor: "#fff",
+      borderRadius: 12,
+      padding: 30,
+      width: "100%",
+      maxWidth: 600,
+      boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+    },
+    heading: {
+      textAlign: "center",
+      color: "#333",
+      marginBottom: 20,
+    },
+    inputGroup: {
+      display: "flex",
+      gap: 10,
+      marginBottom: 20,
+    },
+    input: {
+      flex: 1,
+      padding: 10,
+      borderRadius: 6,
+      border: "1px solid #ccc",
+      fontSize: 16,
+    },
+    button: {
+      padding: "10px 20px",
+      borderRadius: 6,
+      border: "none",
+      fontWeight: "bold",
+      cursor: "pointer",
+      backgroundColor: "#007bff",
+      color: "white",
+    },
+    list: {
+      listStyle: "none",
+      padding: 0,
+    },
+    listItem: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 12,
+      padding: "10px 15px",
+      backgroundColor: "#f4f7fe",
+      borderRadius: 8,
+    },
+    editButton: {
+      backgroundColor: "#28a745",
+      color: "white",
+      border: "none",
+      padding: "5px 10px",
+      borderRadius: 5,
+      marginRight: 8,
+      cursor: "pointer",
+    },
+    deleteButton: {
+      backgroundColor: "#dc3545",
+      color: "white",
+      border: "none",
+      padding: "5px 10px",
+      borderRadius: 5,
+      cursor: "pointer",
+    },
+  };
+
   return (
-    <div style={{ padding: 20, maxWidth: 600, margin: "auto" }}>
-      <h2>Task Manager</h2>
-
-      <div style={{ display: "flex", gap: 10 }}>
-        <input
-          type="text"
-          placeholder="Enter task"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          style={{ flex: 1, padding: 10, borderRadius: 5, border: "1px solid #ccc" }}
-        />
-        <button onClick={handleAddOrUpdateTask} style={{ padding: 10 }}>
-          {editId ? "Update" : "Add"}
-        </button>
+    <div style={styles.page}>
+      <div style={styles.container}>
+        <h2 style={styles.heading}>Task Manager</h2>
+        <div style={styles.inputGroup}>
+          <input
+            type="text"
+            placeholder="Enter task"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            style={styles.input}
+          />
+          <button onClick={handleAddOrUpdateTask} style={styles.button}>
+            {editId ? "Update" : "Add"}
+          </button>
+        </div>
+        <ul style={styles.list}>
+          {tasks.map((task) => (
+            <li key={task._id} style={styles.listItem}>
+              <span>{task.title}</span>
+              <div>
+                <button onClick={() => handleEditTask(task)} style={styles.editButton}>
+                  Edit
+                </button>
+                <button onClick={() => handleDeleteTask(task._id)} style={styles.deleteButton}>
+                  Delete
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
       </div>
-
-      <ul style={{ listStyle: "none", padding: 0, marginTop: 20 }}>
-        {tasks.map((task) => (
-          <li key={task._id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-            <span>{task.title}</span>
-            <div style={{ display: "flex", gap: 10 }}>
-              <button
-                onClick={() => handleEditTask(task)}
-                style={{ backgroundColor: "#007bff", color: "white", border: "none", padding: "5px 10px", borderRadius: 5 }}
-              >
-                Edit
-              </button>
-              <button
-                onClick={() => handleDeleteTask(task._id)}
-                style={{ backgroundColor: "red", color: "white", border: "none", padding: "5px 10px", borderRadius: 5 }}
-              >
-                Delete
-              </button>
-            </div>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }
